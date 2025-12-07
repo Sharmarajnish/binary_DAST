@@ -2,3 +2,5 @@ fastapi>=0.100.0
 uvicorn>=0.23.0
 python-multipart>=0.0.6
 requests>=2.31.0
+boofuzz>=0.4.0
+angr>=9.2.0

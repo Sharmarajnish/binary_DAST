@@ -10,6 +10,7 @@ interface NewScanProps {
 
 const NewScan: React.FC<NewScanProps> = ({ onStart, onCancel }) => {
   const [file, setFile] = useState<File | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [config, setConfig] = useState<ScanConfig>({
     binaryName: '',
     binarySize: 0,
@@ -25,6 +26,30 @@ const NewScan: React.FC<NewScanProps> = ({ onStart, onCancel }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
+      setFile(selectedFile);
+      setConfig({
+        ...config,
+        binaryName: selectedFile.name,
+        binarySize: selectedFile.size,
+      });
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const selectedFile = e.dataTransfer.files[0];
       setFile(selectedFile);
       setConfig({
         ...config,
@@ -55,7 +80,16 @@ const NewScan: React.FC<NewScanProps> = ({ onStart, onCancel }) => {
             Binary Selection
           </h3>
           
-          <div className="border-2 border-dashed border-slate-700 rounded-lg p-8 text-center hover:bg-slate-800/50 hover:border-brand-500/50 transition-all">
+          <div 
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
+              isDragging 
+                ? 'border-brand-500 bg-brand-500/10' 
+                : 'border-slate-700 hover:bg-slate-800/50 hover:border-brand-500/50'
+            }`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
             <input 
               type="file" 
               id="binary-upload" 
@@ -63,15 +97,19 @@ const NewScan: React.FC<NewScanProps> = ({ onStart, onCancel }) => {
               onChange={handleFileChange}
               accept=".bin,.elf,.hex,.s19,.vbf" 
             />
-            <label htmlFor="binary-upload" className="cursor-pointer flex flex-col items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center">
-                <Upload className="w-6 h-6 text-slate-400" />
+            <label htmlFor="binary-upload" className="cursor-pointer flex flex-col items-center gap-3 w-full h-full">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+                isDragging ? 'bg-brand-500 text-white' : 'bg-slate-800 text-slate-400'
+              }`}>
+                <Upload className="w-6 h-6" />
               </div>
               <div>
                 {file ? (
                     <span className="text-brand-400 font-medium text-lg">{file.name}</span>
                 ) : (
-                    <span className="text-slate-300 font-medium">Click to upload firmware</span>
+                    <span className="text-slate-300 font-medium">
+                      {isDragging ? 'Drop firmware here' : 'Click or Drag to upload firmware'}
+                    </span>
                 )}
                 <p className="text-sm text-slate-500 mt-1">
                   {file ? `${(file.size / 1024).toFixed(2)} KB` : 'Supports .bin, .elf, .vbf'}
