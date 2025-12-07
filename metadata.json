@@ -1,0 +1,5 @@
+{
+  "name": "ECU Sentinel DAST",
+  "description": "A modular Dynamic Application Security Testing interface for automotive ECU binaries, featuring Fuzzing (AFL++) and Symbolic Execution (Angr) visualization.",
+  "requestFramePermissions": []
+}
