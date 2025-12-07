@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, Cpu, Play, Settings2, FileCode, AlertCircle } from 'lucide-react';
+import { Upload, Cpu, Play, Settings2, FileCode, AlertCircle, Zap } from 'lucide-react';
 import { ARCHITECTURES } from '../constants';
 import { ScanConfig } from '../types';
 
@@ -15,6 +15,7 @@ const NewScan: React.FC<NewScanProps> = ({ onStart, onCancel }) => {
     binaryName: '',
     binarySize: 0,
     architecture: 'arm',
+    fuzzerEngine: 'aflpp',
     modules: {
       fuzzing: true,
       symbolic: true,
@@ -95,7 +96,7 @@ const NewScan: React.FC<NewScanProps> = ({ onStart, onCancel }) => {
               id="binary-upload" 
               className="hidden" 
               onChange={handleFileChange}
-              accept=".bin,.elf,.hex,.s19,.vbf" 
+              accept=".bin,.elf,.hex,.s19,.vbf,.c,.autosar,.arxml" 
             />
             <label htmlFor="binary-upload" className="cursor-pointer flex flex-col items-center gap-3 w-full h-full">
               <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
@@ -112,7 +113,7 @@ const NewScan: React.FC<NewScanProps> = ({ onStart, onCancel }) => {
                     </span>
                 )}
                 <p className="text-sm text-slate-500 mt-1">
-                  {file ? `${(file.size / 1024).toFixed(2)} KB` : 'Supports .bin, .elf, .vbf'}
+                  {file ? `${(file.size / 1024).toFixed(2)} KB` : 'Supports .bin, .elf, .vbf, .c, .autosar, .arxml'}
                 </p>
               </div>
             </label>
@@ -154,18 +155,52 @@ const NewScan: React.FC<NewScanProps> = ({ onStart, onCancel }) => {
             <div className="space-y-3">
                 <label className="text-sm font-medium text-slate-300">Analysis Modules</label>
                 <div className="space-y-3">
-                    <label className="flex items-center justify-between p-3 bg-slate-950 rounded-lg border border-slate-700 cursor-pointer hover:border-slate-600">
-                        <div className="flex flex-col">
-                            <span className="text-sm font-medium text-slate-200">Fuzzing (AFL++)</span>
-                            <span className="text-xs text-slate-500">Random input mutation for crash detection</span>
-                        </div>
-                        <input 
-                            type="checkbox" 
-                            checked={config.modules.fuzzing}
-                            onChange={(e) => setConfig({...config, modules: {...config.modules, fuzzing: e.target.checked}})}
-                            className="w-4 h-4 rounded border-slate-600 text-brand-600 focus:ring-offset-slate-900"
-                        />
-                    </label>
+                    {/* Fuzzing Toggle & Engine Selection */}
+                    <div className="bg-slate-950 rounded-lg border border-slate-700 overflow-hidden">
+                        <label className="flex items-center justify-between p-3 cursor-pointer hover:bg-slate-900 transition-colors">
+                            <div className="flex flex-col">
+                                <span className="text-sm font-medium text-slate-200">Fuzzing</span>
+                                <span className="text-xs text-slate-500">Random input mutation</span>
+                            </div>
+                            <input 
+                                type="checkbox" 
+                                checked={config.modules.fuzzing}
+                                onChange={(e) => setConfig({...config, modules: {...config.modules, fuzzing: e.target.checked}})}
+                                className="w-4 h-4 rounded border-slate-600 text-brand-600 focus:ring-offset-slate-900"
+                            />
+                        </label>
+                        
+                        {config.modules.fuzzing && (
+                            <div className="px-3 pb-3 pt-1 border-t border-slate-800/50 bg-slate-900/30 flex items-center gap-3">
+                                <span className="text-xs text-slate-400 flex items-center gap-1">
+                                    <Zap className="w-3 h-3" /> Engine:
+                                </span>
+                                <div className="flex gap-2">
+                                    <button 
+                                        onClick={() => setConfig({...config, fuzzerEngine: 'aflpp'})}
+                                        className={`text-xs px-2 py-1 rounded border ${
+                                            config.fuzzerEngine === 'aflpp' 
+                                            ? 'bg-brand-500/20 border-brand-500/50 text-brand-300' 
+                                            : 'border-slate-700 text-slate-500 hover:text-slate-300'
+                                        }`}
+                                    >
+                                        AFL++
+                                    </button>
+                                    <button 
+                                        onClick={() => setConfig({...config, fuzzerEngine: 'honggfuzz'})}
+                                        className={`text-xs px-2 py-1 rounded border ${
+                                            config.fuzzerEngine === 'honggfuzz' 
+                                            ? 'bg-brand-500/20 border-brand-500/50 text-brand-300' 
+                                            : 'border-slate-700 text-slate-500 hover:text-slate-300'
+                                        }`}
+                                    >
+                                        Honggfuzz
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                     <label className="flex items-center justify-between p-3 bg-slate-950 rounded-lg border border-slate-700 cursor-pointer hover:border-slate-600">
                          <div className="flex flex-col">
                             <span className="text-sm font-medium text-slate-200">Symbolic Execution (Angr)</span>
