@@ -16,36 +16,36 @@ export const MOCK_FINDINGS_POOL: Partial<Vulnerability>[] = [
     title: 'SIGSEGV in parser_dispatch',
     cweId: 'CWE-787',
     severity: 'critical',
-    description: 'Memory corruption detected via AFL++ crash. Input vector exceeds buffer allocation in main dispatch loop.',
-    detectionMethod: 'AFL++',
+    description: 'Memory corruption detected via Precogs-Fuzzer crash. Input vector exceeds buffer allocation in main dispatch loop.',
+    detectionMethod: 'Precogs-Fuzzer',
   },
   {
     title: 'Unreachable Exit Condition',
     cweId: 'CWE-835',
     severity: 'medium',
     description: 'Loop detected with symbolic execution that cannot be exited under normal constraints.',
-    detectionMethod: 'Angr',
+    detectionMethod: 'Precogs-SE',
   },
   {
     title: 'Format String Vulnerability',
     cweId: 'CWE-134',
     severity: 'high',
     description: 'User controlled input passed to printf-family function without format specifier.',
-    detectionMethod: 'Angr',
+    detectionMethod: 'Precogs-SE',
   },
   {
     title: 'Integer Underflow',
     cweId: 'CWE-191',
     severity: 'high',
     description: 'Subtraction results in wrap-around causing heap overflow in subsequent allocation.',
-    detectionMethod: 'Angr',
+    detectionMethod: 'Precogs-SE',
   },
   {
     title: 'Use After Free',
     cweId: 'CWE-416',
     severity: 'critical',
     description: 'Object accessed after memory deallocation in connection teardown routine.',
-    detectionMethod: 'QEMU',
+    detectionMethod: 'Precogs-Emulator',
   },
 ];
 
@@ -70,16 +70,16 @@ export const simulateScanStep = (
     if (Math.random() > 0.7) logs.push(generateLog('System', 'Loading binary into memory space...'));
     if (Math.random() > 0.8) logs.push(generateLog('Orchestrator', `Detecting architecture: ${config.architecture.toUpperCase()}`));
   } else if (percentComplete < 40) {
-    stage = config.modules.fuzzing ? 'Fuzzing (AFL++)' : 'Static Analysis';
+    stage = config.modules.fuzzing ? 'Fuzzing (Precogs-Fuzzer)' : 'Static Analysis';
     if (config.modules.fuzzing) {
-        if (Math.random() > 0.6) logs.push(generateLog('AFL-Fuzz', `Havoc cycle ${Math.floor(elapsedTime / 100)}: bitflips done.`));
-        if (Math.random() > 0.8) logs.push(generateLog('AFL-Fuzz', `Exec speed: ${Math.floor(2000 + Math.random() * 500)}/sec`));
+        if (Math.random() > 0.6) logs.push(generateLog('Precogs-Fuzz', `Havoc cycle ${Math.floor(elapsedTime / 100)}: bitflips done.`));
+        if (Math.random() > 0.8) logs.push(generateLog('Precogs-Fuzz', `Exec speed: ${Math.floor(2000 + Math.random() * 500)}/sec`));
     }
   } else if (percentComplete < 80) {
-    stage = config.modules.symbolic ? 'Symbolic Execution (Angr)' : 'Deep Analysis';
+    stage = config.modules.symbolic ? 'Symbolic Execution (Precogs-SE)' : 'Deep Analysis';
     if (config.modules.symbolic) {
-        if (Math.random() > 0.6) logs.push(generateLog('Angr', `Exploring path ${uuid()} constraint set size: ${Math.floor(Math.random() * 50)}`));
-        if (Math.random() > 0.8) logs.push(generateLog('Angr', 'Solving constraints for branch condition...'));
+        if (Math.random() > 0.6) logs.push(generateLog('Precogs-SE', `Exploring path ${uuid()} constraint set size: ${Math.floor(Math.random() * 50)}`));
+        if (Math.random() > 0.8) logs.push(generateLog('Precogs-SE', 'Solving constraints for branch condition...'));
     }
   } else if (percentComplete < 100) {
     stage = 'Report Generation';

@@ -1,0 +1,26 @@
+vbf_version = 2.6;
+
+header {
+    sw_part_number = "JLR_ECM_FW_2024";
+    sw_version = "1.2.3";
+    sw_part_type = EXE;
+    ecu_address = 0x7E0;
+    frame_format = CAN_STANDARD;
+    data_format_identifier = 0x00;
+    call = ERASE;
+    file_checksum = 0x12345678;
+}
+
+description {
+    sw_signature_dev = "PRECOGS_JLR_SIGNATURE";
+    sw_signature = 0xABCDEF0123456789;
+}
+
+// Binary data block (simulated)
+// Format: start_addr length data checksum
+data_block {
+    0x08000000 0x00000100;
+    // Simulated firmware data would be here
+}
+
+file_checksum = 0xDEADBEEF;

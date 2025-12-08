@@ -1,4 +1,4 @@
-import { ScanConfig, ScanSession, Vulnerability, LogEntry } from '../types';
+import { ScanConfig, ScanSession } from '../types';
 
 const API_BASE = 'http://localhost:8000';
 
@@ -19,7 +19,7 @@ export class DastApi {
     const formData = new FormData();
     formData.append('file', file);
 
-    const res = await fetch(`${API_BASE}/upload`, {
+    const res = await fetch(`${API_BASE}/scans/upload`, {
       method: 'POST',
       body: formData,
     });
@@ -29,10 +29,17 @@ export class DastApi {
   }
 
   static async startScan(fileId: string, config: ScanConfig): Promise<{ scan_id: string }> {
-    const res = await fetch(`${API_BASE}/scans`, {
+    const res = await fetch(`${API_BASE}/scans/start`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ file_id: fileId, config }),
+      body: JSON.stringify({
+        file_id: fileId,
+        config: {
+          architecture: config.architecture || 'auto',
+          analysisDepth: config.analysisDepth || 'standard',
+          timeout: config.timeout || 300,
+        }
+      }),
     });
 
     if (!res.ok) throw new Error(`Failed to start scan: ${res.statusText}`);
@@ -42,14 +49,12 @@ export class DastApi {
   static async getScanStatus(scanId: string): Promise<Partial<ScanSession>> {
     const res = await fetch(`${API_BASE}/scans/${scanId}`);
     if (!res.ok) throw new Error(`Failed to fetch status: ${res.statusText}`);
-    
-    // Assume backend returns a JSON shape that matches or needs slight mapping
-    // This mapping adapts the backend response to our frontend ScanSession type
+
     const data = await res.json();
     return {
       status: data.status,
       progress: data.progress,
-      currentStage: data.current_stage || data.stage,
+      currentStage: data.currentStage,
       logs: data.logs?.map((l: any) => ({
         id: l.id || Math.random().toString(36),
         timestamp: l.timestamp ? new Date(l.timestamp).getTime() : Date.now(),
@@ -57,14 +62,15 @@ export class DastApi {
         source: l.source,
         message: l.message
       })) || [],
-      findings: data.vulnerabilities?.map((v: any) => ({
+      findings: data.findings?.map((v: any) => ({
         id: v.id || Math.random().toString(36),
         title: v.title,
-        cweId: v.cwe_id,
+        cweId: v.cweId,
         severity: v.severity,
         description: v.description,
-        detectionMethod: v.detection_method,
+        detectionMethod: v.detectionMethod,
         location: v.location,
+        remediation: v.remediation,
         timestamp: Date.now()
       })) || []
     };

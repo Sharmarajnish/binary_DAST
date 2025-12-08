@@ -3,15 +3,21 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import NewScan from './components/NewScan';
 import ScanDetails from './components/ScanDetails';
+import Reports from './components/Reports';
+import Compliance from './components/Compliance';
+import Documentation from './components/Documentation';
+import SBOMManager from './components/SBOMManager';
+import Settings from './components/Settings';
 import { ViewState, ScanSession, ScanConfig, ConnectionStatus } from './types';
 import { simulateScanStep } from './services/simulationService';
 import { DastApi } from './services/api';
+
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
   const [activeSession, setActiveSession] = useState<ScanSession | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('checking');
-  
+
   // Polling ref to manage intervals
   const pollingRef = useRef<number | null>(null);
 
@@ -27,57 +33,57 @@ const App: React.FC = () => {
   // Main Effect: Polling or Simulation
   useEffect(() => {
     if (activeSession && activeSession.status === 'running') {
-      
+
       if (connectionStatus === 'connected') {
         // --- REAL MODE: Poll Backend ---
         pollingRef.current = window.setInterval(async () => {
-           try {
-             const update = await DastApi.getScanStatus(activeSession.id);
-             setActiveSession(prev => {
-                if (!prev) return null;
-                // Merge logs to avoid duplicates if necessary, or just replace if backend sends full history
-                // Assuming backend sends full object for now
-                return { ...prev, ...update } as ScanSession;
-             });
+          try {
+            const update = await DastApi.getScanStatus(activeSession.id);
+            setActiveSession(prev => {
+              if (!prev) return null;
+              // Merge logs to avoid duplicates if necessary, or just replace if backend sends full history
+              // Assuming backend sends full object for now
+              return { ...prev, ...update } as ScanSession;
+            });
 
-             if (update.status === 'completed' || update.status === 'failed') {
-               if (pollingRef.current) clearInterval(pollingRef.current);
-             }
-           } catch (e) {
-             console.error("Polling failed", e);
-             // Optionally handle connection loss
-           }
+            if (update.status === 'completed' || update.status === 'failed') {
+              if (pollingRef.current) clearInterval(pollingRef.current);
+            }
+          } catch (e) {
+            console.error("Polling failed", e);
+            // Optionally handle connection loss
+          }
         }, 1000);
 
       } else {
         // --- DEMO MODE: Local Simulation ---
         pollingRef.current = window.setInterval(() => {
-            setActiveSession(prevSession => {
-                if (!prevSession) return null;
-                
-                const elapsed = Date.now() - prevSession.startTime;
-                const result = simulateScanStep(elapsed, prevSession.config, prevSession.findings);
+          setActiveSession(prevSession => {
+            if (!prevSession) return null;
 
-                const updatedSession: ScanSession = {
-                    ...prevSession,
-                    logs: [...prevSession.logs, ...result.logs],
-                    findings: result.newFinding ? [result.newFinding, ...prevSession.findings] : prevSession.findings,
-                    progress: result.progress,
-                    currentStage: result.stage,
-                    status: result.complete ? 'completed' : 'running',
-                };
-                
-                if (result.complete && pollingRef.current) {
-                    clearInterval(pollingRef.current);
-                }
-                return updatedSession;
-            });
+            const elapsed = Date.now() - prevSession.startTime;
+            const result = simulateScanStep(elapsed, prevSession.config, prevSession.findings);
+
+            const updatedSession: ScanSession = {
+              ...prevSession,
+              logs: [...prevSession.logs, ...result.logs],
+              findings: result.newFinding ? [result.newFinding, ...prevSession.findings] : prevSession.findings,
+              progress: result.progress,
+              currentStage: result.stage,
+              status: result.complete ? 'completed' : 'running',
+            };
+
+            if (result.complete && pollingRef.current) {
+              clearInterval(pollingRef.current);
+            }
+            return updatedSession;
+          });
         }, 500);
       }
     }
 
     return () => {
-        if (pollingRef.current) clearInterval(pollingRef.current);
+      if (pollingRef.current) clearInterval(pollingRef.current);
     };
   }, [activeSession?.status, connectionStatus]);
 
@@ -85,46 +91,62 @@ const App: React.FC = () => {
     let newSession: ScanSession;
 
     if (connectionStatus === 'connected') {
-        try {
-            // 1. Upload
-            const uploadRes = await DastApi.uploadBinary(file);
-            
-            // 2. Start Scan
-            const startRes = await DastApi.startScan(uploadRes.file_id, config);
-            
-            // 3. Init Session
-            newSession = {
-                id: startRes.scan_id,
-                status: 'running',
-                progress: 0,
-                config,
-                startTime: Date.now(),
-                logs: [],
-                findings: [],
-                currentStage: 'Initializing Backend...',
-            };
-        } catch (e) {
-            console.error("Failed to start backend scan", e);
-            alert("Backend error. Falling back to local mode.");
-            // Fallback to local
-            setConnectionStatus('disconnected');
-            startScan(config, file);
-            return;
-        }
-    } else {
-        // Local Simulation
+      try {
+        // 1. Upload
+        const uploadRes = await DastApi.uploadBinary(file);
+
+        // 2. Start Scan
+        const startRes = await DastApi.startScan(uploadRes.file_id, config);
+
+        // 3. Init Session
         newSession = {
-            id: `sim-${Math.floor(Math.random() * 10000)}`,
-            status: 'running',
-            progress: 0,
-            config,
-            startTime: Date.now(),
-            logs: [],
-            findings: [],
-            currentStage: 'Initializing Environment',
+          id: startRes.scan_id,
+          status: 'running',
+          progress: 0,
+          config,
+          startTime: Date.now(),
+          logs: [],
+          findings: [],
+          currentStage: 'Initializing Backend...',
         };
+      } catch (e) {
+        console.error("Failed to start backend scan", e);
+        alert("Backend error. Falling back to local mode.");
+        // Fallback to local
+        setConnectionStatus('disconnected');
+        startScan(config, file);
+        return;
+      }
+    } else {
+      // Local Simulation
+      newSession = {
+        id: `sim-${Math.floor(Math.random() * 10000)}`,
+        status: 'running',
+        progress: 0,
+        config,
+        startTime: Date.now(),
+        logs: [],
+        findings: [],
+        currentStage: 'Initializing Environment',
+      };
     }
 
+    setActiveSession(newSession);
+    setCurrentView('scan-details');
+  };
+
+  // Start a scan that's already running (from git clone-repo endpoint)
+  const startGitScan = (scanId: string, config: ScanConfig) => {
+    const newSession: ScanSession = {
+      id: scanId,
+      status: 'running',
+      progress: 0,
+      config,
+      startTime: Date.now(),
+      logs: [{ id: '1', timestamp: Date.now(), level: 'info', source: 'System', message: 'Repository cloned, scanning...' }],
+      findings: [],
+      currentStage: 'Scanning Repository...',
+    };
     setActiveSession(newSession);
     setCurrentView('scan-details');
   };
@@ -134,24 +156,34 @@ const App: React.FC = () => {
       case 'dashboard':
         return <Dashboard onNewScan={() => setCurrentView('new-scan')} />;
       case 'new-scan':
-        return <NewScan onStart={startScan} onCancel={() => setCurrentView('dashboard')} />;
+        return <NewScan onStart={startScan} onStartGitScan={startGitScan} onCancel={() => setCurrentView('dashboard')} />;
       case 'scan-details':
         if (!activeSession) return <Dashboard onNewScan={() => setCurrentView('new-scan')} />;
         return <ScanDetails session={activeSession} onBack={() => setCurrentView('dashboard')} />;
+      case 'reports':
+        return <Reports />;
+      case 'compliance':
+        return <Compliance />;
+      case 'documentation':
+        return <Documentation />;
+      case 'sbom':
+        return <SBOMManager />;
+      case 'settings':
+        return <Settings />;
       default:
         return <Dashboard onNewScan={() => setCurrentView('new-scan')} />;
     }
   };
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-200">
-      <Sidebar 
-        currentView={currentView} 
-        setView={setCurrentView} 
+    <div className="flex h-screen bg-gradient-to-br from-precogs-50/50 via-white to-precogs-100/30 text-slate-900">
+      <Sidebar
+        currentView={currentView}
+        setView={setCurrentView}
         connectionStatus={connectionStatus}
       />
       <main className="flex-1 overflow-hidden relative">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-precogs-100/20 via-transparent to-purple-50/20 pointer-events-none"></div>
         {renderContent()}
       </main>
     </div>

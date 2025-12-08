@@ -1,9 +1,37 @@
+# FastAPI server
 fastapi>=0.100.0
 uvicorn>=0.23.0
 python-multipart>=0.0.6
 requests>=2.31.0
-boofuzz>=0.4.0
+
+# DAST Dependencies
+# Core symbolic execution
 angr>=9.2.0
+
+# Protocol fuzzing
+boofuzz>=0.4.0
+
+# Binary format parsing
+pyelftools>=0.29
+intelhex>=2.3.0
+
+# AI Enhancement
 google-generativeai>=0.3.0
+anthropic>=0.18.0
+
+# SARIF output
 sarif-om>=1.0.4
-# triton-library>=0.9.0 # Note: Triton usually requires binary installation or build from source
+
+# Optional: Advanced tools (may require separate installation)
+# These are commented out as they often need special installation procedures:
+#
+# Triton (taint analysis):
+#   Requires building from source or using Docker
+#   See: https://triton.quarkslab.com/documentation/doxygen/#install_sec
+#
+# AFL++ Python bindings:
+#   Install AFL++ separately, then:
+#   pip install aflpp
+#
+# python-can (for real CAN interface):
+#   pip install python-can

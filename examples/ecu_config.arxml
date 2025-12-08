@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0">
+  <AR-PACKAGES>
+    <AR-PACKAGE>
+      <SHORT-NAME>JLR_ECU_Package</SHORT-NAME>
+      <ELEMENTS>
+        
+        <!-- ECU Instance -->
+        <ECU-INSTANCE>
+          <SHORT-NAME>EngineControlModule</SHORT-NAME>
+          <ADMIN-DATA>
+            <DOC-REVISIONS>
+              <DOC-REVISION>
+                <REVISION-LABEL>1.0.0</REVISION-LABEL>
+                <DATE>2024-01-15</DATE>
+              </DOC-REVISION>
+            </DOC-REVISIONS>
+          </ADMIN-DATA>
+        </ECU-INSTANCE>
+        
+        <!-- Application Software Component -->
+        <APPLICATION-SW-COMPONENT-TYPE>
+          <SHORT-NAME>EngineController</SHORT-NAME>
+          <CATEGORY>APPLICATION</CATEGORY>
+          
+          <PORTS>
+            <P-PORT-PROTOTYPE>
+              <SHORT-NAME>EngineStatus_Out</SHORT-NAME>
+            </P-PORT-PROTOTYPE>
+            <R-PORT-PROTOTYPE>
+              <SHORT-NAME>ThrottlePosition_In</SHORT-NAME>
+            </R-PORT-PROTOTYPE>
+            <R-PORT-PROTOTYPE>
+              <SHORT-NAME>CoolantTemp_In</SHORT-NAME>
+            </R-PORT-PROTOTYPE>
+          </PORTS>
+          
+          <INTERNAL-BEHAVIORS>
+            <SWC-INTERNAL-BEHAVIOR>
+              <SHORT-NAME>EngineController_IB</SHORT-NAME>
+              <RUNNABLES>
+                <RUNNABLE-ENTITY>
+                  <SHORT-NAME>EngineControl_Main</SHORT-NAME>
+                  <SYMBOL>EngineControl_Main</SYMBOL>
+                  <MINIMUM-START-INTERVAL>0.01</MINIMUM-START-INTERVAL>
+                </RUNNABLE-ENTITY>
+                <RUNNABLE-ENTITY>
+                  <SHORT-NAME>FuelInjection_Task</SHORT-NAME>
+                  <SYMBOL>FuelInjection_Task</SYMBOL>
+                </RUNNABLE-ENTITY>
+              </RUNNABLES>
+            </SWC-INTERNAL-BEHAVIOR>
+          </INTERNAL-BEHAVIORS>
+        </APPLICATION-SW-COMPONENT-TYPE>
+        
+        <!-- Service Software Component -->
+        <SERVICE-SW-COMPONENT-TYPE>
+          <SHORT-NAME>DiagnosticService</SHORT-NAME>
+          <CATEGORY>SERVICE</CATEGORY>
+          
+          <PORTS>
+            <P-PORT-PROTOTYPE>
+              <SHORT-NAME>DiagRequest</SHORT-NAME>
+            </P-PORT-PROTOTYPE>
+          </PORTS>
+          
+          <INTERNAL-BEHAVIORS>
+            <SWC-INTERNAL-BEHAVIOR>
+              <SHORT-NAME>DiagService_IB</SHORT-NAME>
+              <RUNNABLES>
+                <RUNNABLE-ENTITY>
+                  <SHORT-NAME>UDS_Handler</SHORT-NAME>
+                  <SYMBOL>UDS_Handler</SYMBOL>
+                </RUNNABLE-ENTITY>
+              </RUNNABLES>
+            </SWC-INTERNAL-BEHAVIOR>
+          </INTERNAL-BEHAVIORS>
+        </SERVICE-SW-COMPONENT-TYPE>
+        
+        <!-- CAN Cluster Configuration -->
+        <CAN-CLUSTER>
+          <SHORT-NAME>VehicleCAN</SHORT-NAME>
+          <CAN-CLUSTER-VARIANTS>
+            <CAN-CLUSTER-CONDITIONAL>
+              <BAUDRATE>500000</BAUDRATE>
+            </CAN-CLUSTER-CONDITIONAL>
+          </CAN-CLUSTER-VARIANTS>
+        </CAN-CLUSTER>
+        
+      </ELEMENTS>
+    </AR-PACKAGE>
+  </AR-PACKAGES>
+</AUTOSAR>

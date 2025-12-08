@@ -1,32 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ECU Sentinel DAST</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              slate: {
-                850: '#151f32',
-                900: '#0f172a',
-                950: '#020617',
-              },
-              brand: {
-                500: '#3b82f6',
-                600: '#2563eb',
-              }
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Precogs AI - Product Security Platform</title>
+  <meta name="description"
+    content="Enterprise binary DAST and product security platform for automotive, medical, and industrial devices." />
+  <link rel="icon" type="image/svg+xml"
+    href="https://res.cloudinary.com/dhrbirejf/image/upload/v1700799676/u9mj2mlbkbfkfcdqkevx.svg" />
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            // Precogs Brand Colors
+            precogs: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
             },
-            fontFamily: {
-              mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", 'monospace'],
-            }
+            // Light theme grays
+            surface: {
+              50: '#ffffff',
+              100: '#f8fafc',
+              200: '#f1f5f9',
+              300: '#e2e8f0',
+              400: '#cbd5e1',
+              500: '#94a3b8',
+              600: '#64748b',
+              700: '#475569',
+              800: '#334155',
+              900: '#1e293b',
+            },
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          },
+          boxShadow: {
+            'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
+            'card': '0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)',
+            'elevated': '0 10px 40px -10px rgba(0, 0, 0, 0.1)',
           },
         },
-      }
-    </script>
+      },
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    code,
+    pre,
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
   <script type="importmap">
 {
   "imports": {
@@ -39,7 +86,10 @@
 }
 </script>
 </head>
-  <body class="bg-slate-950 text-slate-200 antialiased overflow-hidden">
-    <div id="root"></div>
-  </body>
+
+<body class="bg-surface-100 text-surface-900 antialiased overflow-hidden font-sans">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
 </html>
