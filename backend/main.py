@@ -19,7 +19,7 @@ import logging
 # Precogs AI Integration
 try:
     import google.generativeai as genai
-    GEMINI_API_KEY = "AIzaSyAv36-cFASlO5WjNw3eEYVKaLZC6vEL3bw"
+    GEMINI_API_KEY = "AIzaSyBqsqRnvtfmy2bY5zybKKOt4Z99WcARWE0"
     genai.configure(api_key=GEMINI_API_KEY)
     gemini_model = genai.GenerativeModel('gemini-2.0-flash')
     GEMINI_AVAILABLE = True
