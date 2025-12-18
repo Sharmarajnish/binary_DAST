@@ -1,6 +1,4 @@
-<div align="center">
-  <img width="1200" height="400" alt="ECU Sentinel DAST Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-  
+
   # 🛡️ ECU Sentinel DAST
   ### Advanced Automotive Binary Security & AI-Powered Vulnerability Analysis
   
